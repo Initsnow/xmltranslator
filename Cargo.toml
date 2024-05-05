@@ -10,3 +10,4 @@ quick-xml = "*"
 tokio = { version = "*", features = ["full"] }
 rust-translate = "*"
 clap ={ version = "*",features = ["derive"]}
+ctrlc = "*"
