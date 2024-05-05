@@ -3,6 +3,7 @@ use std::io::{self, Write};
 use quick_xml::events::{BytesText, Event};
 use quick_xml::Reader;
 use quick_xml::Writer;
+use rust_translate::supported_languages::get_languages;
 use std::io::Cursor;
 
 use rust_translate::translate_from_english;
@@ -16,13 +17,21 @@ extern crate ctrlc;
 struct Args {
     /// File path to OmenMon.en_US.xml(Dowonload here:https://github.com/OmenMon/Localization/tree/master) template
     #[arg(short, long)]
-    path: String,
+    path: Option<String>,
     /// Translate into what language
     #[arg(short, long)]
-    target_language: String,
-    /// Jump with tag's attribute key value(I don't know how to jump to the specified exact position, which would jump to the next position(；′⌒`) )
+    target_language: Option<String>,
+    /// Jump with tag's attribute key value
     #[arg(short, long)]
     jump_to_value: Option<String>,
+    #[command(subcommand)]
+    subcmd: Option<SubCommand>,
+}
+#[derive(Parser, Debug)]
+enum SubCommand {
+    // Define your subcommands here
+    GetLanguages ,
+    // Add more subcommands as needed
 }
 fn exit_hook() {
     ctrlc::set_handler(move || {
@@ -36,11 +45,16 @@ async fn main() {
     exit_hook();
     //Parse env
     let args = Args::parse();
+    if let Some(SubCommand::GetLanguages)=args.subcmd {println!("Supported languages: {}", get_languages().join(", "));return;}
+
     let Args {
         path,
         target_language,
         jump_to_value,
+        ..
     } = args;
+    let path=path.expect("Where is your path??(＃°Д°)");
+    let target_language=target_language.expect("Translate to fy@#%dfh! language (ˉ▽ˉ；)...");
     // 创建 XML 解析器
     let mut reader = Reader::from_file(path).unwrap();
     reader.trim_text(true);
